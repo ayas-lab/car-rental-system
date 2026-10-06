@@ -25,6 +25,7 @@ class DatabaseSeeder extends Seeder
         // register the RoleSeeder
         $this->call([
             RoleSeeder::class,
+            VehicleSeeder::class,
         ]);
     }
 }
