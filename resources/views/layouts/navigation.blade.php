@@ -12,9 +12,43 @@
 
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                        {{ __('Dashboard') }}
-                    </x-nav-link>
+                    @auth
+                        @if(auth()->user()->hasRole('admin'))
+                            <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
+                                {{ __('Admin Panel') }}
+                            </x-nav-link>
+                            <x-nav-link :href="route('admin.vehicles.index')" :active="request()->routeIs('admin.vehicles.*')">
+                                {{ __('Vehicles') }}
+                            </x-nav-link>
+                            <x-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')">
+                                {{ __('Users') }}
+                            </x-nav-link>
+                            <x-nav-link :href="route('admin.reports.index')" :active="request()->routeIs('admin.reports.*')">
+                                {{ __('Reports') }}
+                            </x-nav-link>
+                        @elseif(auth()->user()->hasRole('agent'))
+                            <x-nav-link :href="route('agent.dashboard')" :active="request()->routeIs('agent.dashboard')">
+                                {{ __('Agent Panel') }}
+                            </x-nav-link>
+                            <x-nav-link :href="route('agent.checkin.index')" :active="request()->routeIs('agent.checkin.*')">
+                                {{ __('Check-in') }}
+                            </x-nav-link>
+                            <x-nav-link :href="route('agent.checkout.index')" :active="request()->routeIs('agent.checkout.*')">
+                                {{ __('Check-out') }}
+                            </x-nav-link>
+                        @else
+                            <x-nav-link :href="route('client.dashboard')" :active="request()->routeIs('client.dashboard')">
+                                {{ __('Dashboard') }}
+                            </x-nav-link>
+                            <x-nav-link :href="route('client.reservations.index')" :active="request()->routeIs('client.reservations.*')">
+                                {{ __('My Reservations') }}
+                            </x-nav-link>
+                        @endif
+                    @else
+                        <x-nav-link :href="route('vehicles.index')" :active="request()->routeIs('vehicles.*')">
+                            {{ __('Browse Vehicles') }}
+                        </x-nav-link>
+                    @endauth
                 </div>
             </div>
 
