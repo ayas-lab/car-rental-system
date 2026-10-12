@@ -18,6 +18,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // Users CRUD
     Route::resource('users', UserController::class);
     Route::patch('/users/{user}/role', [UserController::class, 'updateRole'])->name('users.role');
+    Route::patch('/users/{user}/toggle-active', [UserController::class, 'toggleActive'])->name('users.toggle-active');
 
     // Reservations
     Route::resource('reservations', ReservationController::class);
@@ -27,7 +28,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::resource('contracts', ContractController::class)->only(['index', 'show']);
 
     // Invoices
-    Route::resource('invoices', InvoiceController::class);
+    Route::resource('invoices', InvoiceController::class)->except(['create', 'store', 'edit']);
+    Route::get('/invoices/{invoice}/download', [InvoiceController::class, 'download'])->name('invoices.download');
 
     // Reports
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
