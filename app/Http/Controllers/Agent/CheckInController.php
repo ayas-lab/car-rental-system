@@ -9,6 +9,7 @@ use App\Models\Vehicle;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Notifications\VehiclePickedUp;
 
 class CheckInController extends Controller
 {
@@ -68,6 +69,9 @@ class CheckInController extends Controller
                 'mileage' => $validated['pickup_mileage'],
             ]);
         });
+
+            $reservation->refresh();
+            $reservation->user->notify(new VehiclePickedUp($reservation->contract));
 
         return redirect()
             ->route('agent.contracts.show', $reservation->fresh()->contract)

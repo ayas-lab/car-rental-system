@@ -7,6 +7,8 @@ use App\Models\Contract;
 use App\Models\Invoice;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Notifications\VehicleReturned;
+use App\Notifications\InvoiceIssued;
 
 class CheckOutController extends Controller
 {
@@ -85,6 +87,9 @@ class CheckOutController extends Controller
                 'notes'          => $extraCharges > 0 ? 'Inclut frais supplémentaires : ' . ($validated['extra_charges_notes'] ?? '') : null,
             ]);
         });
+
+        $contract->refresh();
+        $contract->client->notify(new VehicleReturned($contract));
 
         return redirect()
             ->route('agent.contracts.show', $contract)

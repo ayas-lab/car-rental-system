@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Reservation;
 use Illuminate\Http\Request;
+use App\Notifications\ReservationConfirmed;
+use App\Notifications\ReservationCancelled;
 
 class ReservationController extends Controller
 {
@@ -90,6 +92,13 @@ class ReservationController extends Controller
         }
 
         $reservation->update(['status' => $newStatus]);
+
+         // Trigger the right notification based on the new status
+        if ($newStatus === 'confirmed') {
+            $reservation->user->notify(new ReservationConfirmed($reservation));
+        } elseif ($newStatus === 'cancelled') {
+            $reservation->user->notify(new ReservationCancelled($reservation));
+        }
 
         return back()->with('success', 'Statut mis à jour.');
     }

@@ -9,6 +9,8 @@ use App\Services\ReservationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
+use App\Notifications\ReservationCreated;
+use App\Notifications\ReservationCancelled;
 
 class ReservationController extends Controller
 {
@@ -55,6 +57,14 @@ class ReservationController extends Controller
 
         $reservation = $service->create($validated, $vehicle, Auth::id());
 
+         // Notify the client
+        $reservation->user->notify(new ReservationCreated($reservation));
+
+        // Notify all admins
+        User::role('admin')->each(function ($admin) use ($reservation) {
+            $admin->notify(new ReservationCreated($reservation));
+        });
+
         return redirect()
             ->route('client.reservations.show', $reservation)
             ->with('success', 'Réservation créée avec succès. Référence : ' . $reservation->reference);
@@ -77,6 +87,14 @@ class ReservationController extends Controller
         }
 
         $reservation->update(['status' => 'cancelled']);
+
+        // Notify client
+        $reservation->user->notify(new ReservationCancelled($reservation));
+
+        // Notify admins
+        User::role('admin')->each(function ($admin) use ($reservation) {
+            $admin->notify(new ReservationCancelled($reservation));
+        });
 
         return redirect()
             ->route('client.reservations.index')
