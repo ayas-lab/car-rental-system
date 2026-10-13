@@ -7,7 +7,7 @@
 
             <div class="flex gap-2">
                 <a href="{{ route('admin.vehicles.edit', $vehicle) }}"
-                   class="px-4 py-2 bg-indigo-600 text-white rounded-md text-sm hover:bg-indigo-700">
+                   class="px-4 py-2 bg-indigo-600 text-black rounded-md text-sm hover:bg-indigo-700">
                     Modifier
                 </a>
                 <a href="{{ route('admin.vehicles.index') }}"

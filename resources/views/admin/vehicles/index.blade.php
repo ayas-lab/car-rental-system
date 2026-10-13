@@ -5,7 +5,7 @@
                 {{ __('Gestion des véhicules') }}
             </h2>
             <a href="{{ route('admin.vehicles.create') }}"
-               class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700">
+               class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-black uppercase tracking-widest hover:bg-indigo-700">
                 + Ajouter un véhicule
             </a>
         </div>

@@ -28,7 +28,7 @@
                     <div class="flex justify-end gap-3 pt-4 border-t">
                         <a href="{{ route('admin.vehicles.index') }}"
                            class="px-4 py-2 border rounded-md text-sm">Annuler</a>
-                        <button class="px-6 py-2 bg-indigo-600 text-white rounded-md text-sm hover:bg-indigo-700">
+                        <button class="px-6 py-2 bg-indigo-600 text-black rounded-md text-sm hover:bg-indigo-700">
                             Enregistrer le véhicule
                         </button>
                     </div>
