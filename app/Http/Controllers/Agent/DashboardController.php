@@ -12,7 +12,7 @@ class DashboardController extends Controller
     public function index()
     {
         $stats = [
-            'pending_checkins'  => Reservation::where('status', 'confirmed')->count(),
+            'pending_checkouts'  => Reservation::where('status', 'confirmed')->count(),
             'active_contracts'  => Contract::where('status', 'active')->count(),
             'overdue_returns'   => Contract::where('status', 'overdue')->count(),
             'vehicles_available'=> Vehicle::where('status', 'available')->count(),

@@ -10,7 +10,7 @@
 
             <div class="bg-white rounded-lg shadow p-6">
                 <h3 class="text-2xl font-bold mb-2">
-                    Bonjour {{ auth()->user()->name }} 👋
+                    Bonjour {{ auth()->user()->name }}
                 </h3>
                 <p class="text-gray-600">Voici vos tâches du jour.</p>
             </div>
@@ -19,7 +19,7 @@
                 <div class="bg-white rounded-lg shadow p-6">
                     <p class="text-sm text-gray-500">Remises à effectuer</p>
                     <p class="text-3xl font-bold text-blue-600 mt-1">
-                        {{ $stats['pending_checkins'] }}
+                        {{ $stats['pending_checkouts'] }}
                     </p>
                 </div>
 
@@ -48,13 +48,13 @@
             <div class="bg-white rounded-lg shadow p-6">
                 <h3 class="font-bold text-lg mb-4">Actions rapides</h3>
                 <div class="flex gap-3 flex-wrap">
-                    <a href="{{ route('agent.checkin.index') }}"
-                       class="px-4 py-2 bg-indigo-600 text-white rounded-md text-sm">
-                        Effectuer un check-in
-                    </a>
                     <a href="{{ route('agent.checkout.index') }}"
-                       class="px-4 py-2 bg-green-600 text-white rounded-md text-sm">
-                        Effectuer un check-out
+                       class="px-4 py-2 bg-indigo-600 text-black rounded-md text-sm">
+                        Effectuer une remise
+                    </a>
+                    <a href="{{ route('agent.checkin.index') }}"
+                       class="px-4 py-2 bg-green-600 text-black rounded-md text-sm">
+                        Effectuer un retour
                     </a>
                     <a href="{{ route('agent.contracts.index') }}"
                        class="px-4 py-2 bg-gray-100 rounded-md text-sm">
@@ -81,9 +81,9 @@
                                         {{ $pickup->start_date->format('d/m/Y') }}
                                     </p>
                                 </div>
-                                <a href="{{ route('agent.checkin.create', $pickup) }}"
+                                <a href="{{ route('agent.checkout.create', $pickup) }}"
                                    class="px-4 py-2 bg-indigo-600 text-white rounded-md text-sm">
-                                    Check-in
+                                    Remettre
                                 </a>
                             </li>
                         @endforeach

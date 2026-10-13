@@ -10,15 +10,15 @@ use Illuminate\Support\Facades\Route;
 Route::middleware(['auth', 'agent'])->prefix('agent')->name('agent.')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // Check-in (pickup)
-    Route::get('/check-in', [CheckInController::class, 'index'])->name('checkin.index');
-    Route::get('/check-in/{reservation}', [CheckInController::class, 'create'])->name('checkin.create');
-    Route::post('/check-in/{reservation}', [CheckInController::class, 'store'])->name('checkin.store');
-
-    // Check-out (return)
+    // Check-out (pickup)
     Route::get('/check-out', [CheckOutController::class, 'index'])->name('checkout.index');
-    Route::get('/check-out/{contract}', [CheckOutController::class, 'edit'])->name('checkout.edit');
-    Route::put('/check-out/{contract}', [CheckOutController::class, 'update'])->name('checkout.update');
+    Route::get('/check-out/{reservation}', [CheckOutController::class, 'create'])->name('checkout.create');
+    Route::post('/check-out/{reservation}', [CheckOutController::class, 'store'])->name('checkout.store');
+
+    // Check-in (return)
+    Route::get('/check-in', [CheckInController::class, 'index'])->name('checkin.index');
+    Route::get('/check-in/{contract}', [CheckInController::class, 'edit'])->name('checkin.edit');
+    Route::put('/check-in/{contract}', [CheckInController::class, 'update'])->name('checkin.update');
 
     // Contracts
     Route::get('/contracts', [ContractController::class, 'index'])->name('contracts.index');

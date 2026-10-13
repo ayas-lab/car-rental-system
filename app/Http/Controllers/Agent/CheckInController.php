@@ -4,84 +4,111 @@ namespace App\Http\Controllers\Agent;
 
 use App\Http\Controllers\Controller;
 use App\Models\Contract;
-use App\Models\Reservation;
-use App\Models\Vehicle;
+use App\Models\Invoice;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use App\Notifications\VehiclePickedUp;
 
 class CheckInController extends Controller
 {
+    /**
+     * List active/overdue contracts awaiting return.
+     */
     public function index()
     {
-        // Reservations ready for pickup today or in the future
-        $reservations = Reservation::with(['user', 'vehicle'])
-            ->where('status', 'confirmed')
-            ->whereDate('start_date', '<=', now()->addDays(3))
-            ->orderBy('start_date')
+        $contracts = Contract::with(['reservation.vehicle', 'client'])
+            ->whereIn('status', ['active', 'overdue'])
+            ->orderBy('signed_at')
             ->paginate(15);
 
-        return view('agent.checkin.index', compact('reservations'));
+        return view('agent.checkin.index', compact('contracts'));
     }
 
-    public function create(Reservation $reservation)
+    /**
+     * Show the retour form for a contract.
+     */
+    public function edit(Contract $contract)
     {
-        if ($reservation->status !== 'confirmed') {
+        if (!in_array($contract->status, ['active', 'overdue'])) {
             return redirect()
                 ->route('agent.checkin.index')
-                ->with('error', 'Cette réservation n\'est pas prête pour le check-in.');
+                ->with('error', 'Ce contrat est déjà clôturé.');
         }
 
-        $reservation->load(['user', 'vehicle']);
+        $contract->load(['reservation.vehicle', 'client']);
 
-        return view('agent.checkin.create', compact('reservation'));
+        return view('agent.checkin.edit', compact('contract'));
     }
 
-    public function store(Request $request, Reservation $reservation)
+    /**
+     * Finalize the contract and generate an invoice.
+     */
+    public function update(Request $request, Contract $contract)
     {
         $validated = $request->validate([
-            'pickup_mileage'      => 'required|integer|min:0',
-            'pickup_fuel_level'   => 'required|in:empty,quarter,half,three_quarters,full',
-            'pickup_condition'    => 'nullable|string|max:1000',
+            'return_mileage'      => 'required|integer|min:' . $contract->pickup_mileage,
+            'return_fuel_level'   => 'required|in:empty,quarter,half,three_quarters,full',
+            'return_condition'    => 'nullable|string|max:1000',
+            'extra_charges'       => 'nullable|numeric|min:0',
+            'extra_charges_notes' => 'nullable|string|max:500',
         ]);
 
-        DB::transaction(function () use ($reservation, $validated) {
-            // Create contract
-            Contract::create([
-                'contract_number'    => $this->generateContractNumber(),
-                'reservation_id'     => $reservation->id,
-                'client_id'          => $reservation->user_id,
-                'agent_id'           => Auth::id(),
-                'signed_at'          => now(),
-                'pickup_mileage'     => $validated['pickup_mileage'],
-                'pickup_fuel_level'  => $validated['pickup_fuel_level'],
-                'pickup_condition'   => $validated['pickup_condition'] ?? null,
-                'status'             => 'active',
+        DB::transaction(function () use ($contract, $validated) {
+            $extraCharges = $validated['extra_charges'] ?? 0;
+
+            $contract->update([
+                'returned_at'         => now(),
+                'return_mileage'      => $validated['return_mileage'],
+                'return_fuel_level'   => $validated['return_fuel_level'],
+                'return_condition'    => $validated['return_condition'] ?? null,
+                'extra_charges'       => $extraCharges,
+                'extra_charges_notes' => $validated['extra_charges_notes'] ?? null,
+                'status'              => 'completed',
             ]);
 
-            // Update reservation status
-            $reservation->update(['status' => 'active']);
+            $contract->reservation->vehicle->update([
+                'status'  => 'available',
+                'mileage' => $validated['return_mileage'],
+            ]);
 
-            // Update vehicle status + mileage
-            $reservation->vehicle->update([
-                'status'  => 'rented',
-                'mileage' => $validated['pickup_mileage'],
+            $contract->reservation->update(['status' => 'completed']);
+
+            $reservation = $contract->reservation;
+            $subtotal    = $reservation->subtotal + $extraCharges;
+            $tax         = round($subtotal * 0.20, 2);
+
+            Invoice::create([
+                'invoice_number' => $this->generateInvoiceNumber(),
+                'reservation_id' => $reservation->id,
+                'client_id'      => $contract->client_id,
+                'subtotal'       => $subtotal,
+                'tax'            => $tax,
+                'total'          => $subtotal + $tax,
+                'status'         => 'unpaid',
+                'issued_at'      => now(),
+                'due_at'         => now()->addDays(15),
+                'notes'          => $extraCharges > 0
+                    ? 'Inclut frais supplémentaires : ' . ($validated['extra_charges_notes'] ?? '')
+                    : null,
             ]);
         });
 
-            $reservation->refresh();
-            $reservation->user->notify(new VehiclePickedUp($reservation->contract));
+        $contract->refresh();
+
+        // Notify client
+        $contract->client->notify(new \App\Notifications\VehicleReturned($contract));
+        if ($contract->reservation->invoice) {
+            $contract->client->notify(new \App\Notifications\InvoiceIssued($contract->reservation->invoice));
+        }
 
         return redirect()
-            ->route('agent.contracts.show', $reservation->fresh()->contract)
-            ->with('success', 'Contrat créé. Véhicule remis au client.');
+            ->route('agent.contracts.show', $contract)
+            ->with('success', 'Véhicule récupéré. Facture générée.');
     }
 
-    protected function generateContractNumber(): string
+    protected function generateInvoiceNumber(): string
     {
-        $prefix = 'CTR-' . now()->format('Ymd') . '-';
-        $count  = Contract::whereDate('created_at', today())->count() + 1;
+        $prefix = 'INV-' . now()->format('Ymd') . '-';
+        $count  = Invoice::whereDate('created_at', today())->count() + 1;
 
         return $prefix . str_pad($count, 4, '0', STR_PAD_LEFT);
     }

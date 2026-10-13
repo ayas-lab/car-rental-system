@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Check-in — ' . $reservation->reference) }}
+            {{ __('Check-out — ' . $reservation->reference) }}
         </h2>
     </x-slot>
 
@@ -19,7 +19,7 @@
             </div>
 
             <div class="bg-white rounded-lg shadow p-6">
-                <form method="POST" action="{{ route('agent.checkin.store', $reservation) }}">
+                <form method="POST" action="{{ route('agent.checkout.store', $reservation) }}">
                     @csrf
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -49,9 +49,9 @@
                     </div>
 
                     <div class="flex justify-end gap-3 mt-6">
-                        <a href="{{ route('agent.checkin.index') }}"
+                        <a href="{{ route('agent.checkout.index') }}"
                            class="px-4 py-2 border rounded-md text-sm">Annuler</a>
-                        <button class="px-6 py-2 bg-indigo-600 text-white rounded-md text-sm hover:bg-indigo-700">
+                        <button class="px-6 py-2 bg-indigo-600 text-black rounded-md text-sm hover:bg-indigo-700">
                             Signer le contrat
                         </button>
                     </div>

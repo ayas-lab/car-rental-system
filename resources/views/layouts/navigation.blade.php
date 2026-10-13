@@ -43,11 +43,11 @@
                             <x-nav-link :href="route('agent.dashboard')" :active="request()->routeIs('agent.dashboard')">
                                 {{ __('Tableau de bord') }}
                             </x-nav-link>
-                            <x-nav-link :href="route('agent.checkin.index')" :active="request()->routeIs('agent.checkin.*')">
-                                {{ __('Check-in') }}
-                            </x-nav-link>
                             <x-nav-link :href="route('agent.checkout.index')" :active="request()->routeIs('agent.checkout.*')">
                                 {{ __('Check-out') }}
+                            </x-nav-link>
+                            <x-nav-link :href="route('agent.checkin.index')" :active="request()->routeIs('agent.checkin.*')">
+                                {{ __('Check-in') }}
                             </x-nav-link>
                             <x-nav-link :href="route('agent.contracts.index')" :active="request()->routeIs('agent.contracts.*')">
                                 {{ __('Contrats') }}
@@ -190,11 +190,11 @@
                     <x-responsive-nav-link :href="route('agent.dashboard')" :active="request()->routeIs('agent.dashboard')">
                         {{ __('Tableau de bord') }}
                     </x-responsive-nav-link>
-                    <x-responsive-nav-link :href="route('agent.checkin.index')" :active="request()->routeIs('agent.checkin.*')">
-                        {{ __('Check-in') }}
-                    </x-responsive-nav-link>
                     <x-responsive-nav-link :href="route('agent.checkout.index')" :active="request()->routeIs('agent.checkout.*')">
                         {{ __('Check-out') }}
+                    </x-responsive-nav-link>
+                    <x-responsive-nav-link :href="route('agent.checkin.index')" :active="request()->routeIs('agent.checkin.*')">
+                        {{ __('Check-in') }}
                     </x-responsive-nav-link>
                 @else
                     <x-responsive-nav-link :href="route('client.dashboard')" :active="request()->routeIs('client.dashboard')">
