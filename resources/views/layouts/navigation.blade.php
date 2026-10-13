@@ -56,7 +56,7 @@
                             <x-nav-link :href="route('client.dashboard')" :active="request()->routeIs('client.dashboard')">
                                 {{ __('Accueil') }}
                             </x-nav-link>
-                            <x-nav-link :href="route('vehicles.index')" :active="request()->routeIs('vehicles.*')">
+                            <x-nav-link :href="route('admin.vehicles.index')" :active="request()->routeIs('vehicles.*')">
                                 {{ __('Véhicules') }}
                             </x-nav-link>
                             <x-nav-link :href="route('client.reservations.index')" :active="request()->routeIs('client.reservations.*')">
