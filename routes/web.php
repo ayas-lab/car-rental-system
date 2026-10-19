@@ -9,7 +9,14 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 
 // Public pages (Visitor can access without login)
-Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/', function () {
+    $featuredVehicles = \App\Models\Vehicle::where('status', 'available')
+        ->latest()
+        ->take(3)
+        ->get();
+
+    return view('welcome', compact('featuredVehicles'));
+})->name('home');
 Route::get('/vehicles', [VehicleController::class, 'index'])->name('vehicles.index');
 Route::get('/vehicles/{vehicle}', [VehicleController::class, 'show'])->name('vehicles.show');
 
